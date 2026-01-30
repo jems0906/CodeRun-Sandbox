@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "express": "^4.18.2",
-    "cors": "^2.8.5"
+    "cors": "^2.8.5",
+    "sqlite3": "^5.1.4"
   },
   "keywords": ["code", "execution", "sandbox", "leetcode", "algorithms"],
   "author": "CodeRun Team",
