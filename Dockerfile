@@ -2,20 +2,22 @@
 FROM node:18-alpine
 
 # Install Python for code execution
-RUN apk add --no-cache python3 py3-pip
+RUN apk add --no-cache python3
 
 # Create app directory
 WORKDIR /app
 
-# Copy package files
+# Copy root package.json and install dependencies
 COPY package*.json ./
-COPY server/package*.json ./server/
-COPY client/package*.json ./client/
+RUN npm install --production
 
-# Install dependencies
-RUN npm install
-RUN cd server && npm install
-RUN cd client && npm install && npm run build
+# Copy server package.json and install dependencies
+COPY server/package*.json ./server/
+RUN cd server && npm install --production
+
+# Copy client package.json and install dependencies, then build
+COPY client/package*.json ./client/
+RUN cd client && npm install --production=false && npm run build
 
 # Copy source code
 COPY . .

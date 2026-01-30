@@ -1,10 +1,16 @@
-# Railway build configuration
-[build]
-builder = "NIXPACKS"
+[phases.setup]
+nixPkgs = ["python3", "nodejs-18_x", "npm"]
 
-[build.nixpacks]
-nixpkgs = "github:NixOS/nixpkgs/nixos-unstable"
+[phases.build]
+cmds = [
+    "npm install --production",
+    "cd server && npm install --production", 
+    "cd client && npm install && npm run build"
+]
 
-[deploy]
-healthcheckPath = "/health"
-restartPolicyType = "ON_FAILURE"
+[phases.start]
+cmd = "npm start"
+
+[variables]
+NODE_ENV = "production"
+PORT = "5000"
