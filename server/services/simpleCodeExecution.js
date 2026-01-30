@@ -208,7 +208,11 @@ except Exception as e:
 
                 // Set timeout
                 setTimeout(() => {
-                    process.kill('SIGKILL');
+                    try {
+                        process.kill('SIGKILL');
+                    } catch (e) {
+                        // Ignore kill errors
+                    }
                 }, timeLimit);
             });
 
