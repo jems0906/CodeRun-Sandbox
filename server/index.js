@@ -4,6 +4,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const compression = require('compression');
 const morgan = require('morgan');
+const path = require('path');
 
 const problemRoutes = require('./routes/problems');
 const submissionRoutes = require('./routes/submissions');
@@ -18,9 +19,22 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Security middleware
-app.use(helmet());
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            styleSrc: ["'self'", "'unsafe-inline'"],
+            scriptSrc: ["'self'"],
+            imgSrc: ["'self'", "data:", "https:"],
+        },
+    },
+}));
+
+// CORS configuration for production
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: process.env.NODE_ENV === 'production' 
+        ? [process.env.RAILWAY_STATIC_URL, process.env.RAILWAY_PUBLIC_DOMAIN].filter(Boolean)
+        : 'http://localhost:3000',
     credentials: true
 }));
 
@@ -60,6 +74,24 @@ app.use('/api/submissions', submissionRoutes);
 app.use('/api/execution', executionRoutes);
 app.use('/api/stats', statsRoutes);
 
+// Serve React static files in production
+if (process.env.NODE_ENV === 'production') {
+    const clientBuildPath = path.join(__dirname, '..', 'client', 'build');
+    app.use(express.static(clientBuildPath));
+    
+    // Handle React routing - serve index.html for all non-API routes
+    app.get('*', (req, res) => {
+        // Skip API routes
+        if (req.path.startsWith('/api') || req.path === '/health') {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'The requested resource does not exist' 
+            });
+        }
+        res.sendFile(path.join(clientBuildPath, 'index.html'));
+    });
+}
+
 // API Documentation
 app.get('/api/docs', (req, res) => {
     res.json({
@@ -69,10 +101,11 @@ app.get('/api/docs', (req, res) => {
             'GET /api/problems': 'Get all problems',
             'GET /api/problems/:id': 'Get specific problem',
             'POST /api/execution/submit': 'Submit code for execution',
-            'GET /api/execution/status/:jobId': 'Get execution status',
-            'GET /api/stats/user/:userId': 'Get user statistics',
+            'GET /api/execution/status/:submissionId': 'Get execution status',
+            'GET /api/stats/platform': 'Get platform statistics',
             'GET /health': 'Health check'
         },
+        frontend: process.env.NODE_ENV === 'production' ? 'Served at /' : 'http://localhost:3000',
         rateLimit: {
             general: '100 requests per 15 minutes',
             execution: '10 executions per minute'

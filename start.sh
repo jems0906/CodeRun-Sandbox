@@ -5,9 +5,13 @@ echo "Starting Railway deployment..."
 echo "Installing Python3..."
 apt-get update && apt-get install -y python3
 
-# Install server dependencies only
-echo "Installing server dependencies..."
-cd server && npm install --production
+# Build React frontend
+echo "Building React frontend..."
+cd client && npm install && npm run build
 
-echo "Setup complete. Starting server..."
+# Install server dependencies
+echo "Installing server dependencies..."
+cd ../server && npm install --production
+
+echo "Setup complete. Starting full-stack server..."
 node index.js
