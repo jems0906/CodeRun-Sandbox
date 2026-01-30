@@ -1,2 +1,2 @@
 # Procfile for Railway
-web: cd server && node index.js
+web: bash start.sh

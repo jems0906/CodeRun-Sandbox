@@ -8,5 +8,13 @@
     "restartPolicyType": "ON_FAILURE",
     "sleepApplication": false,
     "numReplicas": 1
+  },
+  "environments": {
+    "production": {
+      "variables": {
+        "NODE_ENV": "production",
+        "PORT": "5000"
+      }
+    }
   }
 }
