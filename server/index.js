@@ -74,41 +74,45 @@ app.use('/api/submissions', submissionRoutes);
 app.use('/api/execution', executionRoutes);
 app.use('/api/stats', statsRoutes);
 
-// Serve React static files in production
-if (process.env.NODE_ENV === 'production') {
-    const clientBuildPath = path.join(__dirname, '..', 'client', 'build');
-    app.use(express.static(clientBuildPath));
-    
-    // Handle React routing - serve index.html for all non-API routes
-    app.get('*', (req, res) => {
-        // Skip API routes
-        if (req.path.startsWith('/api') || req.path === '/health') {
-            return res.status(404).json({ 
-                success: false, 
-                message: 'The requested resource does not exist' 
-            });
-        }
-        res.sendFile(path.join(clientBuildPath, 'index.html'));
-    });
-}
+// Serve static files (simple HTML frontend)
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Serve simple HTML frontend for root
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // API Documentation
 app.get('/api/docs', (req, res) => {
     res.json({
         message: 'CodeRun Sandbox API',
         version: '1.0.0',
+        description: 'LeetCode-style coding platform with real-time code execution',
+        baseUrl: req.protocol + '://' + req.get('host'),
         endpoints: {
-            'GET /api/problems': 'Get all problems',
-            'GET /api/problems/:id': 'Get specific problem',
+            'GET /api/problems': 'Get all coding problems',
+            'GET /api/problems/:id': 'Get specific problem details',
             'POST /api/execution/submit': 'Submit code for execution',
             'GET /api/execution/status/:submissionId': 'Get execution status',
             'GET /api/stats/platform': 'Get platform statistics',
             'GET /health': 'Health check'
         },
-        frontend: process.env.NODE_ENV === 'production' ? 'Served at /' : 'http://localhost:3000',
-        rateLimit: {
-            general: '100 requests per 15 minutes',
-            execution: '10 executions per minute'
+        features: [
+            '6 Algorithm Problems (Arrays, DP, Binary Search, etc.)',
+            'Real-time Code Execution (Python & JavaScript)',
+            'Submission Tracking & Statistics',
+            'Safe Sandboxed Execution'
+        ],
+        usage: {
+            submit: {
+                url: '/api/execution/submit',
+                method: 'POST',
+                body: {
+                    problemId: 1,
+                    language: 'python',
+                    code: 'def solution():\n    return []'
+                }
+            }
         }
     });
 });

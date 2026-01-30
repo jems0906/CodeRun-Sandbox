@@ -7,7 +7,7 @@
     "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
     "server:dev": "cd server && npm run dev",
     "client:dev": "cd client && npm start",
-    "build": "export NODE_OPTIONS='--max-old-space-size=1024' && export CI=false && cd client && npm ci && npm run build && cd ../server && npm ci --production",
+    "build": "cd server && npm ci --production",
     "start": "cd server && node index.js",
     "setup": "npm run setup:server && npm run setup:client",
     "setup:server": "cd server && npm install",
