@@ -1,26 +1,21 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
-const DB_PATH = path.join(__dirname, '..', 'data', 'coderun.db');
+// Use in-memory database for Railway (ephemeral storage)
+const DB_PATH = ':memory:';
 
 let db = null;
 
 async function initializeDatabase() {
     return new Promise((resolve, reject) => {
-        // Create data directory if it doesn't exist
-        const fs = require('fs');
-        const dataDir = path.dirname(DB_PATH);
-        if (!fs.existsSync(dataDir)) {
-            fs.mkdirSync(dataDir, { recursive: true });
-        }
-
         db = new sqlite3.Database(DB_PATH, (err) => {
             if (err) {
                 reject(err);
                 return;
             }
-            console.log('Connected to SQLite database');
+            console.log('Connected to in-memory SQLite database');
             createTables()
+                .then(() => seedData())
                 .then(resolve)
                 .catch(reject);
         });
@@ -142,6 +137,8 @@ function allQuery(sql, params = []) {
 
 module.exports = {
     initializeDatabase,
+    initDatabase: initializeDatabase,  // Alias for compatibility
+    getDb: getDatabase,
     getDatabase,
     runQuery,
     getQuery,

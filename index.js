@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const { initDatabase, getDb } = require('./config-database');
+const { initializeDatabase, getDb } = require('./config-database');
 const { executeCode } = require('./simpleCodeExecution');
 const fs = require('fs');
 const crypto = require('crypto');
@@ -14,8 +14,41 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static('public'));
 
-// Initialize database
-initDatabase();
+// Health check - simple one without database dependency
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    port: PORT
+  });
+});
+
+// Initialize database and start server
+async function startServer() {
+  try {
+    await initializeDatabase();
+    console.log('✅ Database initialized successfully');
+    
+    const server = app.listen(PORT, '0.0.0.0', () => {
+      console.log(`🚀 CodeRun-Sandbox API Server running on port ${PORT}`);
+      console.log(`📊 API Documentation available at /`);
+      console.log(`💻 Environment: ${process.env.NODE_ENV || 'production'}`);
+      console.log(`🏥 Health check: /health`);
+    });
+
+    // Graceful shutdown
+    process.on('SIGTERM', () => {
+      console.log('SIGTERM received, shutting down gracefully');
+      server.close(() => {
+        process.exit(0);
+      });
+    });
+
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+}
 
 // Get all problems
 app.get('/api/problems', async (req, res) => {
@@ -105,27 +138,12 @@ app.get('/api/submissions/:id', async (req, res) => {
   }
 });
 
-// Health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
-});
-
 // Serve frontend
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 CodeRun-Sandbox API Server running on port ${PORT}`);
-  console.log(`📊 API Documentation available at /`);
-  console.log(`💻 Environment: ${process.env.NODE_ENV || 'production'}`);
-});
-
-process.on('SIGTERM', () => {
-  console.log('SIGTERM received, shutting down gracefully');
-  server.close(() => {
-    process.exit(0);
-  });
-});
+// Start the server
+startServer();
 
 module.exports = app;
