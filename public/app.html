@@ -22,6 +22,7 @@
         .header {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             padding: 20px 30px;
             border-radius: 20px;
             margin-bottom: 30px;
@@ -43,6 +44,7 @@
         .problem-panel, .code-panel {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 25px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
@@ -128,6 +130,9 @@
             background: #f8fafc;
             border: 2px solid #e0e7ff;
         }
+        .result-panel-hidden {
+            display: none;
+        }
         .status-success {
             background: #d1fae5;
             border-color: #10b981;
@@ -192,7 +197,7 @@
 
             <div class="code-panel">
                 <div class="code-controls">
-                    <select class="language-select" id="language">
+                    <select class="language-select" id="language" title="Programming Language Selection" aria-label="Select programming language">
                         <option value="python">Python</option>
                         <option value="javascript">JavaScript</option>
                     </select>
@@ -204,7 +209,7 @@
                 
                 <div id="editor"></div>
                 
-                <div id="result-panel" class="result-panel" style="display: none;">
+                <div id="result-panel" class="result-panel result-panel-hidden">
                     <div id="result-content"></div>
                 </div>
             </div>
@@ -328,7 +333,7 @@
             
             contentDiv.innerHTML = content;
             panel.className = `result-panel ${type ? 'status-' + type : ''}`;
-            panel.style.display = 'block';
+            panel.classList.remove('result-panel-hidden');
         }
 
         // Change language
