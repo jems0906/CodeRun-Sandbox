@@ -1,0 +1,10 @@
+# Railway build configuration
+[build]
+builder = "NIXPACKS"
+
+[build.nixpacks]
+nixpkgs = "github:NixOS/nixpkgs/nixos-unstable"
+
+[deploy]
+healthcheckPath = "/health"
+restartPolicyType = "ON_FAILURE"
