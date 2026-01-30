@@ -101,12 +101,6 @@ const ProblemSolver = () => {
   });
 
   // Polling for results
-  const startPolling = useCallback((submissionId) => {
-    setIsPolling(true);
-    setPollingAttempts(0);
-    pollForResults(submissionId);
-  }, [pollForResults]);
-
   const pollForResults = useCallback(async (submissionId) => {
     try {
       const response = await executionAPI.getStatus(submissionId);
@@ -139,11 +133,16 @@ const ProblemSolver = () => {
         toast.error('Execution timed out');
       }
     } catch (error) {
-      console.error('Polling error:', error);
       setIsPolling(false);
       toast.error('Failed to get execution status');
     }
   }, [pollingAttempts]);
+
+  const startPolling = useCallback((submissionId) => {
+    setIsPolling(true);
+    setPollingAttempts(0);
+    pollForResults(submissionId);
+  }, [pollForResults]);
 
   // Handle code submission
   const handleSubmit = () => {

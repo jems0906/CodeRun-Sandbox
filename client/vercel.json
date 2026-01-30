@@ -1,0 +1,16 @@
+# Vercel deployment configuration for React frontend
+{
+  "functions": {
+    "app/build/static/**": {
+      "headers": {
+        "cache-control": "s-maxage=31536000"
+      }
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
