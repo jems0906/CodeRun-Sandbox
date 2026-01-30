@@ -1,8 +1,8 @@
 # Use Node.js 18 LTS
 FROM node:18-alpine
 
-# Install Docker for code execution
-RUN apk add --no-cache docker-cli
+# Install Python for code execution
+RUN apk add --no-cache python3 py3-pip
 
 # Create app directory
 WORKDIR /app
@@ -20,8 +20,8 @@ RUN cd client && npm install && npm run build
 # Copy source code
 COPY . .
 
-# Create data directory
-RUN mkdir -p data
+# Create temp directory for code execution
+RUN mkdir -p temp
 
 # Expose port
 EXPOSE 5000

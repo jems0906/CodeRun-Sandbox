@@ -1,8 +1,8 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const { v4: uuidv4 } = require('uuid');
-const { getQueue } = require('../config/queue');
-const { runQuery, getQuery, allQuery } = require('../config/database');
+const CodeExecutionService = require('../services/codeExecutionSimple');
+const { run, get, query } = require('../config/database');
 
 const router = express.Router();
 

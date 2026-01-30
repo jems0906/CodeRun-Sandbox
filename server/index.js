@@ -7,11 +7,11 @@ const morgan = require('morgan');
 
 const problemRoutes = require('./routes/problems');
 const submissionRoutes = require('./routes/submissions');
-const executionRoutes = require('./routes/execution');
+const executionRoutes = require('./routes/executionSimple');
 const statsRoutes = require('./routes/stats');
 
 const { initializeDatabase } = require('./config/database');
-const { initializeQueue } = require('./config/queue');
+// Note: Skip queue initialization for Railway deployment
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -91,11 +91,11 @@ app.use('*', (req, res) => {
     });
 });
 
-// Initialize database and queue, then start server
+// Initialize database, then start server (skip queue for Railway)
 async function startServer() {
     try {
         await initializeDatabase();
-        await initializeQueue();
+        console.log('Simple execution mode enabled (no queue)');
         
         app.listen(PORT, () => {
             console.log(`Server running on port ${PORT}`);
