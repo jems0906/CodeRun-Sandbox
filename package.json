@@ -1,0 +1,25 @@
+{
+  "name": "coderun-sandbox",
+  "version": "1.0.0",
+  "description": "Scalable Code Execution Sandbox - LeetCode-style platform",
+  "main": "server/index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
+    "server:dev": "cd server && npm run dev",
+    "client:dev": "cd client && npm start",
+    "build": "cd client && npm run build",
+    "start": "cd server && npm start",
+    "setup": "npm run setup:server && npm run setup:client",
+    "setup:server": "cd server && npm install",
+    "setup:client": "cd client && npm install",
+    "test": "cd server && npm test",
+    "clean": "node clean.js",
+    "railway:deploy": "railway up"
+  },
+  "keywords": ["code", "execution", "sandbox", "leetcode", "algorithms"],
+  "author": "CodeRun Team",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  }
+}

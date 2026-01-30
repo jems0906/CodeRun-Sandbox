@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  # Redis for queue management
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Main application
+  app:
+    build: .
+    ports:
+      - "5000:5000"
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - REDIS_URL=redis://redis:6379
+      - FRONTEND_URL=http://localhost:3000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock  # For Docker-in-Docker
+      - app_data:/app/data
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Pull execution images
+  python-executor:
+    image: python:3.9-alpine
+    command: ["echo", "Python execution image ready"]
+    profiles: ["setup"]
+
+  javascript-executor:
+    image: node:18-alpine
+    command: ["echo", "JavaScript execution image ready"]
+    profiles: ["setup"]
+
+volumes:
+  redis_data:
+  app_data:
