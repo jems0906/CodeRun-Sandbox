@@ -1,0 +1,11 @@
+client/
+node_modules/
+*.log
+.git/
+.vscode/
+.env.local
+.env.development
+.env.test
+.env.production
+README.md
+clean.js
